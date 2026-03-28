@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KD JAAT - AI App Builder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4338ca; --primary-hover: #3730a3;
+            --bg-color: #0f172a; --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc; --text-muted: #94a3b8;
+            --success: #10b981; --neon-glow: 0 0 20px rgba(67, 56, 202, 0.6);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at top right, rgba(67, 56, 202, 0.2), transparent 40%);
+            color: var(--text-main);
+            margin: 0; padding: 20px;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
+        }
+
+        .builder-container {
+            max-width: 800px; width: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: var(--glass-border);
+            border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+
+        h1 { font-family: 'Outfit', sans-serif; font-size: 2.5rem; margin: 0 0 10px 0; background: linear-gradient(135deg, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 30px; }
+
+        .input-group { margin-bottom: 25px; }
+        label { display: block; font-weight: 600; margin-bottom: 10px; color: #cbd5e1; }
+        
+        input[type="text"], textarea {
+            width: 100%; padding: 16px; box-sizing: border-box;
+            background: rgba(15, 23, 42, 0.6); border: 2px solid rgba(71, 85, 105, 0.5);
+            border-radius: 12px; color: white; font-size: 1.1rem; transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+        input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: var(--neon-glow); }
+
+        .btn-magic {
+            width: 100%; padding: 18px; font-size: 1.2rem; font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            color: white; border: none; border-radius: 30px; cursor: pointer;
+            transition: all 0.3s; box-shadow: var(--neon-glow);
+        }
+        .btn-magic:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(139, 92, 246, 0.8); }
+        .btn-magic:disabled { background: #475569; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        /* Terminal Display */
+        .terminal {
+            display: none; margin-top: 30px; background: #000;
+            border-radius: 12px; padding: 20px; font-family: monospace;
+            color: #10b981; border: 1px solid #333; height: 150px; overflow-y: auto;
+        }
+        .terminal p { margin: 5px 0; font-size: 0.95rem; color: #10b981; }
+        
+        /* Result Area */
+        .result-area { display: none; text-align: center; margin-top: 30px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .btn-download {
+            background: #10b981; color: #000; padding: 15px 30px; border-radius: 30px;
+            text-decoration: none; font-weight: 800; font-size: 1.1rem; display: inline-block;
+            transition: all 0.3s; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+        }
+        .btn-download:hover { background: #34d399; transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+    <div class="builder-container">
+        <h1>✨ KD JAAT AI App Builder</h1>
+        <p>Describe your dream Android app. Our AI will write the code and compile the APK.</p>
+
+        <div class="input-group">
+            <label>App Name</label>
+            <input type="text" id="appName" placeholder="e.g., KD JAAT Notes Viewer">
+        </div>
+
+        <div class="input-group">
+            <label>What should the app do?</label>
+            <textarea id="appPrompt" rows="4" placeholder="e.g., A simple study app that opens PDF links natively and has a dark mode toggle..."></textarea>
+        </div>
+
+        <button class="btn-magic" id="generateBtn" onclick="startGeneration()">Generate App 🚀</button>
+
+        <div class="terminal" id="terminal"></div>
+
+        <div class="result-area" id="resultArea">
+            <h3 style="color: var(--success); font-size: 1.5rem; margin-bottom: 15px;">✅ Compilation Complete!</h3>
+            <a href="#" class="btn-download" onclick="alert('In a live environment, this would trigger the actual .apk download from your backend server.')">Download APK</a>
+        </div>
+    </div>
+
+    <script>
+        function startGeneration() {
+            const name = document.getElementById('appName').value.trim();
+            const prompt = document.getElementById('appPrompt').value.trim();
+            
+            if(!name || !prompt) return alert("Please fill in the app name and description.");
+
+            const btn = document.getElementById('generateBtn');
+            const terminal = document.getElementById('terminal');
+            const resultArea = document.getElementById('resultArea');
+
+            // Reset UI
+            btn.disabled = true;
+            btn.innerText = "Building Matrix... ⏳";
+            terminal.style.display = "block";
+            terminal.innerHTML = "";
+            resultArea.style.display = "none";
+
+            // Simulated AI Generation Steps
+            const steps = [
+                "> Initializing AI Agent...",
+                "> Analyzing prompt requirements...",
+                "> Generating React Native boilerplate...",
+                "> Writing UI components...",
+                "> Connecting state management...",
+                "> Configuring Android Manifest...",
+                "⚙️ Initiating Gradle Build (This usually takes a backend server)...",
+                "> Resolving dependencies...",
+                "> Compiling classes.dex...",
+                "> Signing APK with debug key...",
+                "✅ APK Build Successful!"
+            ];
+
+            let stepIndex = 0;
+
+            function showNextStep() {
+                if (stepIndex < steps.length) {
+                    const p = document.createElement('p');
+                    p.innerText = steps[stepIndex];
+                    terminal.appendChild(p);
+                    terminal.scrollTop = terminal.scrollHeight; // Auto-scroll
+                    
+                    stepIndex++;
+                    // Random delay between 500ms and 1500ms to look realistic
+                    setTimeout(showNextStep, Math.random() * 1000 + 500);
+                } else {
+                    // Finished
+                    btn.innerText = "App Ready! 🎉";
+                    resultArea.style.display = "block";
+                }
+            }
+
+            // Start the fake terminal output
+            setTimeout(showNextStep, 500);
+        }
+    </script>
+</body>
+</html>
